@@ -1,9 +1,7 @@
 server:
   replicas: 2
   service:
-    type: NodePort
-    nodePortHttp: 32080
-    nodePortHttps: 32443
+    type: LoadBalancer
   resources:
     requests:
       cpu: 250m
