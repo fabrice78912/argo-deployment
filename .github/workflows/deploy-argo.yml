@@ -7,7 +7,7 @@ on:
   workflow_dispatch:
 
 permissions:
-  id-token: write   # Obligatoire pour OIDC.
+  id-token: write   # Obligatoire pour OIDC
   contents: read
 
 jobs:
@@ -63,8 +63,8 @@ jobs:
             -n argocd \
             -f helm/values-ha.yaml \
             --set server.service.type=LoadBalancer \
-            --set server.service.nodePortHttp=32080 \
-            --set server.service.nodePortHttps=32443
+            --set server.service.nodePortHttp=80 \
+            --set server.service.nodePortHttps=443
 
       - name: Show Argo CD service (NodePort)
         run: |
