@@ -14,6 +14,6 @@ argo-deployment/
 │ └── argocd-ingress.yaml # (optionnel) Exemple d'Ingress
 ├── .github/
 │ └── workflows/
-│ └── deploy-argo.yml # Workflow GitHub Actions
+│    └── deploy-argo.yml # Workflow GitHub Actions
 └── README.md
 

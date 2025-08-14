@@ -4,9 +4,10 @@ on:
   push:
     branches:
       - main
+  workflow_dispatch:
 
 permissions:
-  id-token: write   # Obligatoire pour OIDC
+  id-token: write   # Obligatoire pour OIDC.
   contents: read
 
 jobs:
@@ -25,13 +26,15 @@ jobs:
       - name: Configure AWS credentials via OIDC
         uses: aws-actions/configure-aws-credentials@v4
         with:
-          role-to-assume: arn:aws:iam::${{ secrets.AWS_ACCOUNT_ID }}:role/GitHubActionsEKSRole
+          role-to-assume: arn:aws:iam::${{ secrets.AWS_ACCOUNT_ID }}:role/GitHubActionsECRRole
           aws-region: ${{ secrets.AWS_REGION }}
 
-      - name: Install kubectl
-        uses: azure/setup-kubectl@v3
-        with:
-          version: '1.27.3'
+      - name: Install kubectl via curl
+        run: |
+          curl -LO "https://dl.k8s.io/release/$(curl -L -s https://dl.k8s.io/release/stable.txt)/bin/linux/amd64/kubectl"
+          chmod +x kubectl
+          sudo mv kubectl /usr/local/bin/
+          kubectl version --client
 
       - name: Install Helm
         uses: azure/setup-helm@v3
@@ -44,9 +47,13 @@ jobs:
             --name $EKS_CLUSTER_NAME \
             --region $AWS_REGION
 
-      - name: Create namespace argocd
+      - name: Ensure argocd namespace exists
         run: |
-          kubectl create namespace argocd || echo "Namespace exists"
+          if ! kubectl get ns argocd >/dev/null 2>&1; then
+            kubectl create namespace argocd
+          else
+            echo "Namespace argocd already exists"
+          fi
 
       - name: Deploy Argo CD via Helm (HA NodePort)
         run: |
@@ -66,3 +73,9 @@ jobs:
       - name: Verify Argo CD pods
         run: |
           kubectl get pods -n argocd -o wide
+
+      - name: Optional - Get Argo CD admin password
+        run: |
+          echo "Admin password:"
+          kubectl -n argocd get secret argocd-initial-admin-secret -o jsonpath="{.data.password}" | base64 --decode
+          echo
