@@ -7,7 +7,7 @@ on:
   workflow_dispatch:
 
 permissions:
-  id-token: write   # Obligatoire pour OIDC
+  id-token: write   # Obligatoire pour OIDC.
   contents: read
 
 jobs:
@@ -63,20 +63,20 @@ jobs:
             -n argocd \
             -f helm/values-ha.yaml \
             --set server.service.type=LoadBalancer \
-            --set server.service.nodePortHttp=80 \
-            --set server.service.nodePortHttps=443
+#            --set server.service.nodePortHttp=80 \
+#            --set server.service.nodePortHttps=443
 
-      - name: Show Argo CD service (NodePort)
-        run: |
-          kubectl get svc -n argocd argocd-server -o wide
+#      - name: Show Argo CD service (NodePort)
+#        run: |
+#          kubectl get svc -n argocd argocd-server -o wide
 
       - name: Verify Argo CD pods
         run: |
           kubectl get pods -n argocd -o wide
 
-      - name: Optional - Get Argo CD admin password
-        run: |
-          echo "Admin password:"
-          kubectl -n argocd get secret argocd-initial-admin-secret -o jsonpath="{.data.password}" | base64 --decode
-          echo
+#      - name: Optional - Get Argo CD admin password
+#        run: |
+#          echo "Admin password:"
+#          kubectl -n argocd get secret argocd-initial-admin-secret -o jsonpath="{.data.password}" | base64 --decode
+#          echo
         

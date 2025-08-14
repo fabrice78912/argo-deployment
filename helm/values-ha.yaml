@@ -14,7 +14,7 @@ server:
       memory: 512Mi
 
 controller:
-  replicas: 2
+  replicas: 1
   resources:
     requests:
       cpu: 250m
