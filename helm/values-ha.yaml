@@ -1,5 +1,10 @@
 server:
   replicas: 2
+  strategy:
+    type: RollingUpdate
+    rollingUpdate:
+      maxSurge: 1
+      maxUnavailable: 1
   service:
     type: LoadBalancer
     ports:
@@ -14,7 +19,12 @@ server:
       memory: 512Mi
 
 controller:
-  replicas: 1
+  replicas: 2
+  strategy:
+    type: RollingUpdate
+    rollingUpdate:
+      maxSurge: 1
+      maxUnavailable: 1
   resources:
     requests:
       cpu: 250m
@@ -25,6 +35,11 @@ controller:
 
 repoServer:
   replicas: 2
+  strategy:
+    type: RollingUpdate
+    rollingUpdate:
+      maxSurge: 1
+      maxUnavailable: 1
   resources:
     requests:
       cpu: 100m
