@@ -1,0 +1,68 @@
+name: Deploy Argo CD HA (NodePort - OIDC)
+
+on:
+  push:
+    branches:
+      - main
+
+permissions:
+  id-token: write   # Obligatoire pour OIDC
+  contents: read
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    env:
+      AWS_REGION: ${{ secrets.AWS_REGION }}
+      AWS_ACCOUNT_ID: ${{ secrets.AWS_ACCOUNT_ID }}
+      EKS_CLUSTER_NAME: ${{ secrets.EKS_CLUSTER_NAME }}
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+
+      - name: Configure AWS credentials via OIDC
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          role-to-assume: arn:aws:iam::${{ secrets.AWS_ACCOUNT_ID }}:role/GitHubActionsEKSRole
+          aws-region: ${{ secrets.AWS_REGION }}
+
+      - name: Install kubectl
+        uses: azure/setup-kubectl@v3
+        with:
+          version: '1.27.3'
+
+      - name: Install Helm
+        uses: azure/setup-helm@v3
+        with:
+          version: 'v3.12.0'
+
+      - name: Update kubeconfig for EKS
+        run: |
+          aws eks update-kubeconfig \
+            --name $EKS_CLUSTER_NAME \
+            --region $AWS_REGION
+
+      - name: Create namespace argocd
+        run: |
+          kubectl create namespace argocd || echo "Namespace exists"
+
+      - name: Deploy Argo CD via Helm (HA NodePort)
+        run: |
+          helm repo add argo https://argoproj.github.io/argo-helm
+          helm repo update
+          helm upgrade --install argocd argo/argo-cd \
+            -n argocd \
+            -f helm/values-ha.yaml \
+            --set server.service.type=NodePort \
+            --set server.service.nodePortHttp=32080 \
+            --set server.service.nodePortHttps=32443
+
+      - name: Show Argo CD service (NodePort)
+        run: |
+          kubectl get svc -n argocd argocd-server -o wide
+
+      - name: Verify Argo CD pods
+        run: |
+          kubectl get pods -n argocd -o wide
