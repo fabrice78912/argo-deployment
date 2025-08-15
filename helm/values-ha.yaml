@@ -38,8 +38,8 @@ repoServer:
   strategy:
     type: RollingUpdate
     rollingUpdate:
-      maxSurge: 1
-      maxUnavailable: 1
+      maxSurge: 1   # on peut avoir 1 pod de plus que le nombre normal pendant la mise à jour. Si tu as 3 réplicas (replicas: 3), Kubernetes peut monter jusqu’à 3 + 1 = 4 pods temporairement pendant l’update.
+      maxUnavailable: 1  # Kubernetes peut tuer au maximum 1 pod avant qu’un nouveau soit prêt .Si tu as 3 réplicas, il y aura toujours au moins 2 pods actifs pendant l’update.
   resources:
     requests:
       cpu: 100m

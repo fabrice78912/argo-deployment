@@ -47,20 +47,21 @@ jobs:
             --name $EKS_CLUSTER_NAME \
             --region $AWS_REGION
 
-      - name: Ensure argocd namespace exists
-        run: |
-          if ! kubectl get ns argocd >/dev/null 2>&1; then
-            kubectl create namespace argocd
-          else
-            echo "Namespace argocd already exists"
-          fi
+#      - name: Ensure argocd namespace exists
+#        run: |
+#          if ! kubectl get ns argocd >/dev/null 2>&1; then
+#            kubectl create namespace argocd
+#          else
+#            echo "Namespace argocd already exists"
+#          fi
 
       - name: Deploy Argo CD via Helm (HA NodePort)
         run: |
           helm repo add argo https://argoproj.github.io/argo-helm
           helm repo update
           helm upgrade --install argocd argo/argo-cd \
-            -n argocd \
+            --namespace argocd \
+            --create-namespace \
             -f helm/values-ha.yaml \
             --set server.service.type=LoadBalancer \
 #            --set server.service.nodePortHttp=80 \
@@ -70,9 +71,9 @@ jobs:
 #        run: |
 #          kubectl get svc -n argocd argocd-server -o wide
 
-      - name: Verify Argo CD pods
-        run: |
-          kubectl get pods -n argocd -o wide
+#      - name: Verify Argo CD pods
+#        run: |
+#          kubectl get pods -n argocd -o wide
 
 #      - name: Optional - Get Argo CD admin password
 #        run: |
