@@ -1,5 +1,5 @@
 server:
-  replicas: 2
+  replicas: 4
   strategy:
     type: RollingUpdate
     rollingUpdate:
@@ -19,7 +19,7 @@ server:
       memory: 512Mi
 
 controller:
-  replicas: 2
+  replicas: 4
   strategy:
     type: RollingUpdate
     rollingUpdate:
@@ -34,7 +34,7 @@ controller:
       memory: 512Mi
 
 repoServer:
-  replicas: 2
+  replicas: 4
   strategy:
     type: RollingUpdate
     rollingUpdate:

@@ -1,0 +1,21 @@
+#apiVersion: v1
+#kind: ConfigMap
+#metadata:
+#  name: argocd-cm
+#  namespace: argocd
+#data:
+#  url: https://afca6bb2de1a4494794523865a48c1b9-772146355.ca-central-1.elb.amazonaws.com
+#  dex.config: |
+#    connectors:
+#    - type: github
+#      id: github
+#      name: GitHub
+#      config:
+#        clientID: $github-oauth-secret:clientID
+#        clientSecret: $github-oauth-secret:clientSecret
+#        orgs:
+#        - name: MyOrg #nom de mon organisation
+#          teams:
+#          - dev-team
+#          - qa-team
+#          - ops-team

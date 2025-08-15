@@ -1,0 +1,39 @@
+#apiVersion: v1
+#kind: ConfigMap
+#metadata:
+#name: argocd-rbac-cm
+#namespace: argocd
+#data:
+#policy.csv: |
+##############################################
+## Association des groupes aux rôles
+##############################################
+#  g, github:dev-team, role:dev-role
+#  g, github:qa-team, role:stag-role
+#  g, github:ops-team, role:prod-role
+#
+#  #############################################
+#  # DEV – accès complet au projet dev-project
+#  #############################################
+#  p, role:dev-role, applications, get, dev-project/*, allow
+#  p, role:dev-role, applications, sync, dev-project/*, allow
+#  p, role:dev-role, repositories, get, *, allow
+#
+#  #############################################
+#  # STAGING – accès complet au projet stag-project
+#  #############################################
+#  p, role:stag-role, applications, get, stag-project/*, allow
+#  p, role:stag-role, applications, sync, stag-project/*, allow
+#  p, role:stag-role, repositories, get, *, allow
+#
+#  #############################################
+#  # PROD – accès complet au projet prod-project
+#  #############################################
+#  p, role:prod-role, applications, get, prod-project/*, allow
+#  p, role:prod-role, applications, sync, prod-project/*, allow
+#  p, role:prod-role, repositories, get, *, allow
+#
+##############################################
+## Rôle par défaut (lecture seule)
+##############################################
+#policy.default: role:readonly
