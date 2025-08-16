@@ -48,7 +48,7 @@ jobs:
           # Test connectivity
           kubectl get ns
 
-      - name: Deploy Argo CD via Helm (HA NodePort)
+      - name: Deploy Argo CD via Helm (HA LoadBalancer)
         run: |
           helm repo add argo https://argoproj.github.io/argo-helm
           helm repo update
@@ -79,83 +79,3 @@ jobs:
           kubectl -n argocd rollout restart deployment argocd-server
 
           echo "✅ Argo CD admin password reset to: $NEW_PASS"
-
-
-#name: Deploy Argo CD HA (NodePort - OIDC)
-#
-#on:
-#  push:
-#    branches:
-#      - main
-#  workflow_dispatch:
-#
-#permissions:
-#  id-token: write   # Obligatoire pour OIDC.
-#  contents: read
-#
-#jobs:
-#  deploy:
-#    runs-on: ubuntu-latest
-#
-#    env:
-#      AWS_REGION: ${{ secrets.AWS_REGION }}
-#      AWS_ACCOUNT_ID: ${{ secrets.AWS_ACCOUNT_ID }}
-#      EKS_CLUSTER_NAME: ${{ secrets.EKS_CLUSTER_NAME }}
-#      NEW_PASS: ${{ secrets.NEW_PASS }}   # 🔹 [MODIF] Nouveau mot de passe par défaut ajouté
-#
-#    steps:
-#      - name: Checkout repository
-#        uses: actions/checkout@v3
-#
-#      - name: Configure AWS credentials via OIDC
-#        uses: aws-actions/configure-aws-credentials@v4
-#        with:
-#          role-to-assume: arn:aws:iam::${{ secrets.AWS_ACCOUNT_ID }}:role/GitHubActionsECRRole
-#          aws-region: ${{ secrets.AWS_REGION }}
-#
-#      - name: Install kubectl via curl
-#        run: |
-#          curl -LO "https://dl.k8s.io/release/$(curl -L -s https://dl.k8s.io/release/stable.txt)/bin/linux/amd64/kubectl"
-#          chmod +x kubectl
-#          sudo mv kubectl /usr/local/bin/
-#          kubectl version --client
-#
-#      - name: Install Helm
-#        uses: azure/setup-helm@v3
-#        with:
-#          version: 'v3.12.0'
-#          github-token: ${{ secrets.GITHUB_TOKEN }}
-#
-#      - name: Update kubeconfig for EKS
-#        run: |
-#          aws eks update-kubeconfig \
-#            --name $EKS_CLUSTER_NAME \
-#            --region $AWS_REGION
-#
-#      - name: Deploy Argo CD via Helm (HA NodePort)
-#        run: |
-#          helm repo add argo https://argoproj.github.io/argo-helm
-#          helm repo update
-#          helm upgrade --install argocd argo/argo-cd \
-#            --namespace argocd \
-#            --create-namespace \
-#            -f helm/values-ha.yaml \
-#            --set server.service.type=LoadBalancer
-#
-#      - name: Reset Argo CD admin password   # 🔹 [MODIF] Nouvelle étape ajoutée
-#        run: |
-#          sudo apt-get update && sudo apt-get install -y apache2-utils   # 🔹 [MODIF] Installation utilitaire htpasswd
-#
-#          # 🔹 [MODIF] Génération hash bcrypt du mot de passe
-#          NEW_HASH=$(htpasswd -bnBC 10 "" "$NEW_PASS" | tr -d ':\n' | sed 's/$2y/$2a/')
-#
-#          # 🔹 [MODIF] Mise à jour du secret Argo CD avec la nouvelle méthode sécurisée
-#          kubectl -n argocd create secret generic argocd-secret \
-#            --from-literal=admin.password="$NEW_HASH" \
-#            --from-literal=admin.passwordMtime="$(date +%FT%T%Z)" \
-#            --dry-run=client -o yaml | kubectl apply -f -
-#
-#          # Redémarrage du serveur Argo CD pour appliquer le mot de passe
-#          kubectl -n argocd rollout restart deployment argocd-server
-#
-#          echo "✅ Mot de passe admin réinitialisé à: $NEW_PASS"

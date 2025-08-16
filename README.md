@@ -1,19 +1,21 @@
-# 🚀 Déploiement Argo CD HA sur EKS avec NodePort & OIDC GitHub Actions
+# 🚀 Argo CD HA Deployment on EKS with LoadBalancer & GitHub Actions OIDC
 
 ## 📌 Description
-Ce projet permet de déployer **Argo CD en mode Haute Disponibilité (HA)** sur un cluster **Amazon EKS**, en exposant l'interface web via un **Service NodePort**.  
-L'authentification entre GitHub Actions et AWS se fait via **OIDC** (OpenID Connect), ce qui évite l'utilisation de clés AWS dans les secrets GitHub.
+
+This project deploys **Argo CD in High Availability (HA) mode** on an **Amazon EKS** cluster, exposing the web UI through a **LoadBalancer Service**.
+Authentication between GitHub Actions and AWS is handled via **OIDC** (OpenID Connect), eliminating the need to store AWS keys in GitHub secrets.
 
 ---
 
-## 📂 Structure du projet
+## 📂 Project Structure
+
 argo-deployment/
 ├── helm/
-│ └── values-ha.yaml # Configuration HA pour Argo CD
+│   └── values-ha.yaml # HA configuration for Argo CD
 ├── manifests/
-│ └── argocd-ingress.yaml # (optionnel) Exemple d'Ingress
+│   └── argocd-ingress.yaml # (optional) Example Ingress
 ├── .github/
-│ └── workflows/
-│    └── deploy-argo.yml # Workflow GitHub Actions
+│   └── workflows/
+│       └── deploy-argo.yml # GitHub Actions workflow
 └── README.md
 
